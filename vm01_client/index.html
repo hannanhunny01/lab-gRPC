@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gRPC Dictionary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+        h1 {
+            color: #333;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+            font-size: 16px;
+        }
+        .word-list {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>gRPC Dictionary</h1>
+    <div>
+        <h2>Add Word</h2>
+        <input type="text" id="wordInput" placeholder="Enter a word" />
+        <button onclick="addWord()">Add</button>
+    </div>
+    <div>
+        <h2>Word List</h2>
+        <button onclick="getWords()">Refresh</button>
+        <div id="wordList" class="word-list">
+            <p>No words yet.</p>
+        </div>
+    </div>
+
+    <script>
+        // Ajuste o IP para o servidor Flask
+        const API_BASE = 'http://192.168.10.100:8080';
+
+        // Função para adicionar uma palavra
+        async function addWord() {
+            console.log("Attempting to add word...");
+            const word = document.getElementById('wordInput').value.trim();
+            if (!word) {
+                alert("Please enter a word.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/add_word`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ word })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    console.error("Error response from server:", error);
+                    alert("Error: " + (error.error || "Failed to add word."));
+                    return;
+                }
+
+                const result = await response.json();
+                console.log("Response from /add_word:", result);
+                alert(result.message || "Word added successfully!");
+                document.getElementById('wordInput').value = '';
+            } catch (error) {
+                console.error("Error in addWord:", error);
+                alert("Failed to add word. Please check the console for details.");
+            }
+        }
+
+        // Função para obter a lista de palavras
+        async function getWords() {
+            console.log("Fetching word list...");
+            try {
+                const response = await fetch(`${API_BASE}/get_words`);
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    console.error("Error response from server:", error);
+                    alert("Error: " + (error.error || "Failed to fetch words."));
+                    return;
+                }
+
+                const result = await response.json();
+                console.log("Response from /get_words:", result);
+
+                const wordList = document.getElementById('wordList');
+                wordList.innerHTML = '';
+
+                if (!result.words || result.words.length === 0) {
+                    wordList.innerHTML = '<p>No words yet.</p>';
+                } else {
+                    result.words.forEach(word => {
+                        const wordItem = document.createElement('p');
+                        wordItem.textContent = word;
+                        wordList.appendChild(wordItem);
+                    });
+                }
+            } catch (error) {
+                console.error("Error in getWords:", error);
+                alert("Failed to fetch words. Please check the console for details.");
+            }
+        }
+    </script>
+</body>
+</html>

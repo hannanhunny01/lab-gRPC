@@ -1,0 +1,4 @@
+/home/vm02/build/CMakeFiles/hw_grpc_proto.dir
+/home/vm02/build/CMakeFiles/server.dir
+/home/vm02/build/CMakeFiles/edit_cache.dir
+/home/vm02/build/CMakeFiles/rebuild_cache.dir

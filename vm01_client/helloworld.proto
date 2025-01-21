@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package helloworld;
+
+// Define a mensagem para adicionar uma palavra
+message AddWordRequest {
+  string word = 1;
+}
+
+message AddWordResponse {
+  string message = 1; // Confirmação
+}
+
+// Define a mensagem para obter as palavras
+message GetWordsRequest {}
+
+message GetWordsResponse {
+  repeated string words = 1;
+}
+
+// Define o serviço gRPC
+service WordDictionary {
+  rpc AddWord (AddWordRequest) returns (AddWordResponse);
+  rpc GetWords (GetWordsRequest) returns (GetWordsResponse);
+}
